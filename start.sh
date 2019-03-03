@@ -49,7 +49,7 @@ fi
 
 
 ## start services as needed
-service rsyslog start
+
 ### crond
 
 service cron start
