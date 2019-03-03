@@ -22,6 +22,7 @@ ENV GOSU_VERSION 1.10
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN set -x \
+ && add-apt-repository ppa:adiscon/v8-stable \
  && apt-get update -qq \
  && apt-get install -qqy --no-install-recommends ca-certificates curl \
  && rm -rf /var/lib/apt/lists/* \
@@ -35,9 +36,7 @@ RUN set -x \
  && gosu nobody true \
  && apt-get update -qq \
  && apt-get install -qqy openjdk-8-jdk tzdata \
- && add-apt-repository ppa:adiscon/v8-stable \
- && apt-get update \
- && apt-get install rsyslog \
+ && apt-get -y install rsyslog \
  && apt-get clean \
  && set +x
 
@@ -66,6 +65,12 @@ RUN mkdir ${ES_HOME} \
 ADD ./elasticsearch-init /etc/init.d/elasticsearch
 RUN sed -i -e 's#^ES_HOME=$#ES_HOME='$ES_HOME'#' /etc/init.d/elasticsearch \
  && chmod +x /etc/init.d/elasticsearch
+
+### install Elasticsearch geoip
+WORKDIR ${ES_HOME}
+RUN yes | CONF_DIR=/etc/elasticsearch gosu elasticsearch bin/elasticsearch-plugin \
+    install -b ingest-geoip  
+ 
 
 
 ### install Logstash
@@ -126,7 +131,7 @@ RUN cp ${ES_HOME}/config/log4j2.properties ${ES_HOME}/config/jvm.options \
     ${ES_PATH_CONF} \
  && chown -R elasticsearch:elasticsearch ${ES_PATH_CONF} \
  && chmod -R +r ${ES_PATH_CONF}
- && bin/elasticsearch-plugin install ingest-geoip
+
 
 ### configure Logstash
 
@@ -137,6 +142,7 @@ ADD ./logstash-beats.key /etc/pki/tls/private/logstash-beats.key
 
 # pipelines
 ADD pipelines.yml ${LOGSTASH_PATH_SETTINGS}/pipelines.yml
+
 
 # filters
 ADD ./02-beats-input.conf ${LOGSTASH_PATH_CONF}/conf.d/02-beats-input.conf
