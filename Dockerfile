@@ -2,7 +2,7 @@
 # Elasticsearch, Logstash, Kibana 6.6.0
 
 # Build with:
-# docker build -t <repo-user>/elk .
+# docker build -t <repo-user>/elk ..
 
 # Run with:
 # docker run -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk <repo-user>/elk
