@@ -170,7 +170,6 @@ RUN chmod 644 /etc/logrotate.d/elasticsearch \
 ### Add rsyslog config files and start service
 ADD ./rsyslog.conf /etc/rsyslog.conf
 ADD ./50-default.conf /etc/rsyslog.d/50-default.conf
-RUN servie rsyslog start
 
 ### configure Kibana
 
